@@ -67,26 +67,26 @@ describe('useCart Hook', () => {
   });
 
   it('should be able to add a new product', async () => {
-    const productId = 3;
+    const product = {
+      id: 3,
+      title: "Tênis Adidas Duramo Lite 2.0",
+      price: 219.9,
+      image: "https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis3.jpg"
+    }
 
-    apiMock.onGet(`stock/${productId}`).reply(200, {
+    apiMock.onGet(`stock/${product.id}`).reply(200, {
       id: 3,
       amount: 2,
     });
-    apiMock.onGet(`products/${productId}`).reply(200, {
-      id: 3,
-      title: 'Tênis Adidas Duramo Lite 2.0',
-      price: 219.9,
-      image:
-        'https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis3.jpg',
-    });
+
+    apiMock.onGet(`products/${product.id}`).reply(200, product);
 
     const { result, waitForNextUpdate } = renderHook(useCart, {
       wrapper: CartProvider,
     });
 
     act(() => {
-      result.current.addProduct(productId);
+      result.current.addProduct(product.id, product.title, product.price, product.image);
     });
 
     await waitForNextUpdate({ timeout: 200 });
@@ -126,17 +126,22 @@ describe('useCart Hook', () => {
   });
 
   it('should not be able add a product that does not exist', async () => {
-    const productId = 4;
+    const product = {
+      id: 4,
+      title: "Tênis de Caminhada Leve Confortável",
+      price: 179.9,
+      image: "https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis1.jpg"
+    }
 
-    apiMock.onGet(`stock/${productId}`).reply(404);
-    apiMock.onGet(`products/${productId}`).reply(404);
+    apiMock.onGet(`stock/${product.id}`).reply(404);
+    apiMock.onGet(`products/${product.id}`).reply(404);
 
     const { result, waitFor } = renderHook(useCart, {
       wrapper: CartProvider,
     });
 
     act(() => {
-      result.current.addProduct(productId);
+      result.current.addProduct(product.id, product.title, product.price, product.image);
     });
 
     await waitFor(
@@ -155,26 +160,25 @@ describe('useCart Hook', () => {
   });
 
   it('should be able to increase a product amount when adding a product that already exists on cart', async () => {
-    const productId = 1;
+    const product = {
+      id: 1,
+      title: "Tênis de Caminhada Leve Confortável",
+      price: 179.9,
+      image: "https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis1.jpg"
+    }
 
-    apiMock.onGet(`stock/${productId}`).reply(200, {
+    apiMock.onGet(`stock/${product.id}`).reply(200, {
       id: 1,
       amount: 3,
     });
-    apiMock.onGet(`products/${productId}`).reply(200, {
-      id: 1,
-      image:
-        'https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis1.jpg',
-      price: 179.9,
-      title: 'Tênis de Caminhada Leve Confortável',
-    });
+    apiMock.onGet(`products/${product.id}`).reply(200, product);
 
     const { result, waitForNextUpdate } = renderHook(useCart, {
       wrapper: CartProvider,
     });
 
     act(() => {
-      result.current.addProduct(productId);
+      result.current.addProduct(product.id, product.title, product.price, product.image);
     });
 
     await waitForNextUpdate({ timeout: 200 });
@@ -206,25 +210,25 @@ describe('useCart Hook', () => {
   });
 
   it('should not be able to increase a product amount when running out of stock', async () => {
-    const productId = 2;
-
-    apiMock.onGet(`stock/${productId}`).reply(200, {
-      id: 2,
-      amount: 1,
-    });
-    apiMock.onGet(`products/${productId}`).reply(200, {
+    const product = {
       id: 2,
       title: "Tênis VR Caminhada Confortável Detalhes Couro Masculino",
       price: 139.9,
       image: "https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis2.jpg"
+    }
+
+    apiMock.onGet(`stock/${product.id}`).reply(200, {
+      id: 2,
+      amount: 1,
     });
+    apiMock.onGet(`products/${product.id}`).reply(200, product);
 
     const { result, waitFor } = renderHook(useCart, {
       wrapper: CartProvider,
     });
 
     act(() => {
-      result.current.addProduct(productId);
+      result.current.addProduct(product.id, product.title, product.price, product.image);
     });
 
     await waitFor(
@@ -274,7 +278,7 @@ describe('useCart Hook', () => {
   });
 
   it('should not be able to remove a product that does not exist', () => {
-    const productId = 3;
+    const productId = 8;
 
     const { result } = renderHook(useCart, {
       wrapper: CartProvider,

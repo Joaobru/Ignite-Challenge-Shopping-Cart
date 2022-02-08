@@ -74,7 +74,6 @@ describe('Home Page', () => {
       secondProductCartQuantity,
       thirdProductCartQuantity,
     ] = getAllByTestId('cart-product-quantity');
-
     expect(firstProductCartQuantity).toHaveTextContent('2');
     expect(secondProductCartQuantity).toHaveTextContent('1');
     expect(thirdProductCartQuantity).toHaveTextContent('0');
@@ -83,15 +82,23 @@ describe('Home Page', () => {
   it('should be able to add a product to cart', async () => {
     const { getAllByTestId, rerender } = render(<Home />);
 
+    const product = {
+      id: 1,
+      image:
+        'https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis1.jpg',
+      price: 179.9,
+      title: 'Tênis de Caminhada Leve Confortável',
+    }
+
     await waitFor(() => getAllByTestId('add-product-button'), {
-      timeout: 200,
+      timeout: 300,
     });
 
     const [addFirstProduct] = getAllByTestId('add-product-button');
 
     fireEvent.click(addFirstProduct);
 
-    expect(mockedAddProduct).toHaveBeenCalledWith(1);
+    expect(mockedAddProduct).toHaveBeenCalledWith(product.id, product.title, product.price, product.image);
 
     mockedUseCartHook.mockReturnValueOnce({
       cart: [
